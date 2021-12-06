@@ -5,7 +5,7 @@ function readFile(fileName: string): string {
     return fs.readFileSync(fileName, "utf8");
 }
 
-let contents = readFile("day1/input.txt");
+let contents = readFile("inputs/input1.txt");
 //console.log(contents);
 
 // count the number of times a depth measurement increases from the previous measurement. (There is no measurement before the first measurement.)
