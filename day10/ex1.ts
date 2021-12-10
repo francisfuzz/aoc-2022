@@ -5,11 +5,25 @@ const input = fs.readFileSync("inputs/input10.txt", "utf8").split("\n");
 
 // create a stack with push, pop and peek methods
 class ChunkLine {
-  private static ChunkMap = new Map([
+  private static OpenChunkMap = new Map([
     [")", "("],
     ["}", "{"],
     ["]", "["],
     [">", "<"]    
+  ]);
+
+  private static CloseChunkMap = new Map([
+    ["(", ")"],
+    ["{", "}"],
+    ["[", "]"],
+    ["<", ">"]    
+  ]);
+
+  private static CloseScores = new Map([
+    [")", 1],
+    ["]", 2],
+    ["}", 3],
+    [">", 4]
   ]);
 
   private items: string[] = [];
@@ -27,16 +41,30 @@ class ChunkLine {
   }
 
   isNextCharValid(c: string) {
-    return ChunkLine.ChunkMap.get(c) === this.peek();
+    return ChunkLine.OpenChunkMap.get(c) === this.peek();
   }
 
   isOpenChunk(c: string) {
-      return [...ChunkLine.ChunkMap.values()].includes(c);
+      return [...ChunkLine.OpenChunkMap.values()].includes(c);
   }
 
   isCloseChunk(c: string) {
-      return [...ChunkLine.ChunkMap.keys()].includes(c);
+      return [...ChunkLine.OpenChunkMap.keys()].includes(c);
   }
+
+  completeLine() {
+      //console.log(`Open sequence: ${this.items.join("")}`);
+      const closeSeq = this.items.reverse().map(c => ChunkLine.CloseChunkMap.get(c) ?? "");
+      console.log(`Close sequence: ${closeSeq.join("")}`);
+      return closeSeq;
+  }
+
+  scoreCompletion() {
+    const close = this.completeLine();
+    const total = close.reduce((total, c) => (total * 5) + (ChunkLine.CloseScores.get(c) ?? 0), 0);
+    console.log(`Completion score: ${total}`);
+    return total;
+  }  
 }
 
 const errors: Map<number, string> = new Map();
@@ -69,3 +97,26 @@ errors.forEach((v, k) => {
     total += scoreMap.get(v) ?? 0;
 });
 console.log(`Total score: ${total}`);
+
+// discard the error lines from the input
+const incompleteLines = input.filter((_, i) => !errors.has(i));
+console.log(`Found ${incompleteLines.length} lines without errors`);
+
+const scores: number[] = [];
+incompleteLines.forEach(l => {
+    const chunk = new ChunkLine();
+    console.log("Line: ", l);
+    l.split("").forEach(c => {
+        if (chunk.isOpenChunk(c)) {
+            chunk.push(c);
+        } else {
+            chunk.pop();
+        }
+    });
+    scores.push(chunk.scoreCompletion());
+});
+
+// get the middle item from scores
+scores.sort((a, b) => a - b);
+const middle = Math.floor(scores.length / 2);
+console.log(`Middle score: ${scores[middle]}`);
