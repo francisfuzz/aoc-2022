@@ -37,6 +37,8 @@ function navigateToEnd(previousPaths: string[], currentCave: string) {
     const curIsSmall = isSmallCave(currentCave);
     if ((curIsSmall && !previousPaths.includes(currentCave)) || !curIsSmall) {
         previousPaths.push(currentCave);
+    } else {
+        return;
     }
 
     const nextCaves = cavesFrom(currentCave).filter(cave => {
