@@ -1,7 +1,5 @@
 import * as fs from "fs";
 
-const pathMap = fs.readFileSync("inputs/input12-test1.txt", "utf8").split("\n");
-
 function cavesFrom(cave: string) {
     const caves = new Set<string>();
     pathMap.forEach(path => {
@@ -50,8 +48,10 @@ function navigateToEnd(previousPaths: string[], currentCave: string) {
     });
 }
 
+const pathMap = fs.readFileSync("inputs/input12.txt", "utf8").split("\n");
+
 navigateToEnd([], "start");
-endPaths.forEach(path => {
-    console.log(path.join(","));
-});
+// endPaths.forEach(path => {
+//     console.log(path.join(","));
+// });
 console.log(`Total paths: ${endPaths.length}`);
