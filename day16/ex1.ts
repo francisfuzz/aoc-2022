@@ -26,25 +26,66 @@ function convertToBinary(str: string) {
     return str.split("").reduce((acc, curr) => acc * 2 + parseInt(curr), 0);
 }
 
-
 // types
 const LITERAL = 4;
 
 class Packet {
-    public version = -1;
-    public type = -1;
-    
+    // literal property
+    public literal = 0;
+
+    // operator properties
+    public lengthTypeID = "";
+    public operatorChildPackets = new Array<Packet>();
+    public subPacketStringLength = 0;
+    public numSubPackets = 0;
+
+    constructor(public parser: Parser, public version: number, public type: number) {
+        if (this.type === LITERAL) {
+            this.literal = this.parseLiteralFromHex();
+        } else {
+            this.parseOperator();
+        }
+    }
+
+    parseLiteralFromHex() {
+        let isLastGroup;
+        let literalString = "";
+        do {
+            isLastGroup = this.parser.getNextChars(1) === "0";
+            literalString += `${this.parser.getNextChars(4)}`;
+        } while (!isLastGroup);
+        return parseInt(literalString, 2);
+    }
+
+    parseOperator() {
+        this.lengthTypeID = this.parser.getNextChars(1);
+        if (this.lengthTypeID === "0") {
+            const bitLengthChars = this.parser.getNextChars(15);
+            this.subPacketStringLength = parseInt(bitLengthChars, 2);
+            const targetPos = this.parser.binaryPos + this.subPacketStringLength;
+            while(this.parser.binaryPos < targetPos) {
+                this.operatorChildPackets.push(this.parser.parseNextPacket());
+            }
+        } else {
+            const subPacketCountChars = this.parser.getNextChars(11);
+            this.numSubPackets = parseInt(subPacketCountChars, 2);
+            for(let i = 0; i < this.numSubPackets; i++) {
+                this.operatorChildPackets.push(this.parser.parseNextPacket());
+            }
+        }
+    }
+
+    sumVersions(): number {
+        return this.operatorChildPackets.reduce((acc, curr) => acc + curr.sumVersions(), this.version);
+    }
+}
+
+class Parser {
     hexPos = 0;
     binaryPos = 0;
     curWord = "";
 
-    public literal = 0;
-
-    public childPackets = new Array<Packet>();
-
     constructor(public rawHexString: string) {
-        this.parseHeader();
-        this.parseData();
     }
 
     getNextChars(num: number) {
@@ -55,48 +96,116 @@ class Packet {
         // slice the next num chars from the current word
         const nextChars = this.curWord.substring(0, num);
         this.curWord = this.curWord.substring(num);
-        this.binaryPos += num - 1;
+        this.binaryPos += num;
         return nextChars;
     }
 
-    parseHeader() {
-        this.version = convertToBinary(this.getNextChars(3));
-        this.type = convertToBinary(this.getNextChars(3));
+    parseNextPacket() {
+        const version = convertToBinary(this.getNextChars(3));
+        const type = convertToBinary(this.getNextChars(3));
+        return new Packet(this, version, type);
     }
-    
-    parseData() {
-        if (this.type === LITERAL) {
-            this.parseLiteral();
-        }
+}
+
+function testParserLiteral() {
+    console.log("Testing D2FE28");
+    const parser = new Parser("D2FE28");
+    const literal = parser.parseNextPacket();
+
+    if (literal.version !== 6) {
+        throw new Error("Version parse incorrect");
     }
-
-    parseLiteral() {
-        let isLastGroup;
-        let literalString = "";
-        do {
-            isLastGroup = this.getNextChars(1) === "0";
-            literalString += `${this.getNextChars(4)}`;
-        } while (!isLastGroup);
-        this.literal = parseInt(literalString, 2);
+    if (literal.type !== LITERAL) {
+        throw new Error("Type parse incorrect");
     }
+    if (literal.literal !== 2021) {
+        throw new Error("Literal parse incorrect");
+    }
+    console.log("Passed!");
+}
 
-    parseSubPackets() {
+function testParserOperator() {
+    console.log("Testing 38006F45291200");
+    const parser = new Parser("38006F45291200");
+    const operator = parser.parseNextPacket();
 
+    if (operator.version !== 1) {
+        throw new Error("Version parse incorrect");
+    }
+    if (operator.type === LITERAL) {
+        throw new Error("Type parse incorrect");
+    }
+    if (operator.lengthTypeID !== "0") {
+        throw new Error("Length type indicator is incorrect");
+    }
+    if (operator.subPacketStringLength !== 27) {
+        throw new Error("subPacketStringLength is incorrect");
+    }
+    if (operator.operatorChildPackets.length !== 2) {
+        throw new Error("operatorChildPackets.length is incorrect");
+    }
+    if (operator.operatorChildPackets[0].literal !== 10) {
+        throw new Error("operatorChildPackets[0].literal is incorrect");
+    }
+    if (operator.operatorChildPackets[1].literal !== 20) {
+        throw new Error("operatorChildPackets[1].literal is incorrect");
+    }
+    console.log("Pass!");
+
+    console.log("Testing EE00D40C823060");
+    const parser2 = new Parser("EE00D40C823060");
+    const operator2 = parser2.parseNextPacket();
+
+    if (operator2.version !== 7) {
+        throw new Error("Version parse incorrect");
+    }
+    if (operator2.type === LITERAL) {
+        throw new Error("Type parse incorrect");
+    }
+    if (operator2.lengthTypeID !== "1") {
+        throw new Error("Length type indicator is incorrect");
+    }
+    if (operator2.numSubPackets !== 3) {
+        throw new Error("subPacketStringLength is incorrect");
+    }
+    if (operator2.operatorChildPackets.length !== 3) {
+        throw new Error("operatorChildPackets.length is incorrect");
+    }
+    if (operator2.operatorChildPackets[0].literal !== 1) {
+        throw new Error("operatorChildPackets[0].literal is incorrect");
+    }
+    if (operator2.operatorChildPackets[1].literal !== 2) {
+        throw new Error("operatorChildPackets[1].literal is incorrect");
+    }
+    if (operator2.operatorChildPackets[2].literal !== 3) {
+        throw new Error("operatorChildPackets[2].literal is incorrect");
+    }
+    console.log("Pass!");
+}
+
+function testVersionSum(hex: string, expected: number) {
+    const parser = new Parser(hex);
+    const packet = parser.parseNextPacket();
+    const sum = packet.sumVersions();
+    if (sum !== expected) {
+        throw new Error(`${hex}: Expected ${expected}, got ${sum}`);
+    } else {
+        console.log(`${hex}: Sum test passed!`);
     }
 }
 
 function testParser() {
-    const test1 = new Packet("D2FE28");
-    if (test1.version !== 6) {
-        throw new Error("Version parse incorrect");
-    }
-    if (test1.type !== LITERAL) {
-        throw new Error("Type parse incorrect");
-    }
-    if (test1.literal !== 2021) {
-        throw new Error("Literal parse incorrect");
-    }
+    testParserLiteral();
+    testParserOperator();
+    testVersionSum("8A004A801A8002F478", 16);
+    testVersionSum("620080001611562C8802118E34", 12);
+    testVersionSum("C0015000016115A2E0802F182340", 23);
+    testVersionSum("A0016C880162017C3686B18A3D4780", 31);
+    console.log("Parser is ready!");
 }
 
-testParser();
-console.log("Parser is ready!");
+//testParser();
+
+const input = fs.readFileSync('inputs/input16.txt', 'utf8');
+const parser = new Parser(input);
+console.log(parser.parseNextPacket().sumVersions());
