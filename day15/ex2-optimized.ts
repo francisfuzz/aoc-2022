@@ -20,6 +20,28 @@ class Node {
     constructor(public distance: number, public r: number, public c: number) { }
 }
 
+class PriQ {
+    constructor(public nodes: Node[]) { 
+    }
+
+    push(node: Node) {
+        const idx = this.nodes.findIndex(n => n.distance >= node.distance);
+        if (idx === -1) {
+            this.nodes.push(node);
+        } else {
+            this.nodes.splice(idx, 0, node);
+        }
+    }
+
+    pop(): Node {
+        return this.nodes.shift()!;
+    }
+
+    get length() {
+        return this.nodes.length;
+    }
+}
+
 // convenience
 let NXROW = [-1, 0, 1,  0];
 let NXCOL = [ 0, 1, 0, -1];
@@ -27,20 +49,12 @@ let NXCOL = [ 0, 1, 0, -1];
 // dijkstra
 function solve(tileCount: number) {
     const D = new Array(HEIGHT * tileCount).fill(0).map(() => new Array(WIDTH * tileCount).fill(undefined));
-    const Q = [new Node(0, 0, 0)];
+    const Q = new PriQ([new Node(0, 0, 0)]);
     
     let iter = 0;
     while(Q.length > 0) {
         iter++;
-
-        // pop the smallest distance node off the Q
-        let curNode = Q[0];
-        for(let i = 1; i < Q.length; i++) {
-            if(Q[i].distance < curNode.distance) {
-                curNode = Q[i];
-            }
-        }
-        Q.splice(Q.indexOf(curNode), 1);
+        let curNode = Q.pop();
         
         const [dist, r, c] = [curNode.distance, curNode.r, curNode.c];
 
