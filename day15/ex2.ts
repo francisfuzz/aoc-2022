@@ -24,8 +24,8 @@ class Node {
 const D = new Array(HEIGHT * 5).fill(0).map(() => new Array(WIDTH * 5).fill(-1));
 const Q = [new Node(0, 0, 0)];
 
-let NXROW = [-1, 0, 1, 0];
-let NXCOL = [0, 1, 0, -1];
+let NXROW = [-1, 0, 1,  0];
+let NXCOL = [ 0, 1, 0, -1];
 
 while(Q.length > 0) {
     const curNode = Q.pop()!;
@@ -43,7 +43,7 @@ while(Q.length > 0) {
     }
 
     console.log(`${r} ${c} ${val} ${dist}`);
-    //if (r === (HEIGHT * 5) - 1 && c === (WIDTH * 5) - 1) break;
+    if (r === (HEIGHT * 5) - 1 && c === (WIDTH * 5) - 1) break;
 
     for (let i = 0; i < 4; i++) {
         const nextRow = r + NXROW[i];
