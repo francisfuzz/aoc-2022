@@ -1,3 +1,5 @@
+import * as fs from "fs";
+
 function findCloseBraceIndex(input: string) {
     let closeCount = 1;
     let stop = false;
@@ -59,6 +61,25 @@ class SnailFishNumber {
         }
     }
 
+    get isSimplePair() {
+        return !(this.left instanceof SnailFishNumber) && !(this.right instanceof SnailFishNumber);
+    }
+
+    get magnitude() {
+        let total = 0;
+        if (this.left instanceof SnailFishNumber) {
+            total += 3 * this.left.magnitude;
+        } else {
+            total += 3 * this.left;
+        }
+        if (this.right instanceof SnailFishNumber) {
+            total += 2 * this.right.magnitude;
+        } else {
+            total += 2 * this.right;
+        }
+        return total;
+    }
+
     constructor(numberArray: any, public parent?: SnailFishNumber) {
         const left = numberArray[0];
         const right = numberArray[1];
@@ -77,7 +98,7 @@ class SnailFishNumber {
 
     addRight(n: number) {
         if (this.right instanceof SnailFishNumber) {
-            this.right.addLeft(n);
+            this.right.addRight(n);
         } else {
             this.right += n;
         }
@@ -85,7 +106,7 @@ class SnailFishNumber {
 
     addLeft(n: number) {
         if (this.left instanceof SnailFishNumber) {
-            this.left.addRight(n);
+            this.left.addLeft(n);
         } else {
             this.left += n;
         }
@@ -95,10 +116,6 @@ class SnailFishNumber {
         const leftDepth = this.left instanceof SnailFishNumber ? this.left.getNestedCount() + 1 : 0;
         const rightDepth = this.right instanceof SnailFishNumber ? this.right.getNestedCount() + 1 : 0;
         return Math.max(leftDepth, rightDepth);
-    }
-
-    get isSimplePair() {
-        return !(this.left instanceof SnailFishNumber) && !(this.right instanceof SnailFishNumber);
     }
 
     toPairStack(stack?: SnailFishNumber[]): SnailFishNumber[] {
@@ -213,9 +230,9 @@ class SnailFishNumber {
     }
 
     reduce() {
+        //console.log(`reducing ${this.toString()}`);
         const didExplode = this.explode();
         if (didExplode) {
-            this.split();
             this.reduce();
         } else {
             const didSplit = this.split();
@@ -297,28 +314,78 @@ function testSplit(input: string, expected: string) {
     }
 }
 
+function testMagnitude(input: string, expected: number) {
+    const x = new SnailFishNumber(parseNumberString(input));
+    if (x.magnitude !== expected) {
+        throw new Error(`Magnitude failed - expected ${expected} but got ${x.magnitude}`);
+    } else {
+        console.log(`Magnitude passed - got expected ${expected}`);
+    }
+}
+
 function test() {
-    // testParse("[1,2]");
-    // testParse("[[1,2],3]");
-    // testParse("[9,[8,7]]");
-    // testParse("[[1,9],[8,5]]");
-    // testParse("[2,[[[[[9,8],1],2],3],4]]");
+    testParse("[1,2]");
+    testParse("[[1,2],3]");
+    testParse("[9,[8,7]]");
+    testParse("[[1,9],[8,5]]");
+    testParse("[2,[[[[[9,8],1],2],3],4]]");
 
-    // testExplode("[[[[[9,8],1],2],3],4]", "[[[[0,9],2],3],4]");
-    // testExplode("[7,[6,[5,[4,[3,2]]]]]", "[7,[6,[5,[7,0]]]]");
-    // testExplode("[2,[[[[[7,6],1],2],3],4]]", "[9,[[[0,9],3],4]]");
+    testExplode("[[[[[9,8],1],2],3],4]", "[[[[0,9],2],3],4]");
+    testExplode("[7,[6,[5,[4,[3,2]]]]]", "[7,[6,[5,[7,0]]]]");
+    testExplode("[2,[[[[[7,6],1],2],3],4]]", "[9,[[[0,9],3],4]]");
 
-    // testAdd(["[1,1]", "[2,2]", "[3,3]", "[4,4]"], "[[[[1,1],[2,2]],[3,3]],[4,4]]");
-    // testAdd(["[1,1]", "[2,2]", "[3,3]", "[4,4]", "[5,5]"], "[[[[3,0],[5,3]],[4,4]],[5,5]]");
-    // testAdd(["[1,1]", "[2,2]", "[3,3]", "[4,4]", "[5,5]", "[6,6]"], "[[[[5,0],[7,4]],[5,5]],[6,6]]");
+    testAdd(["[1,1]", "[2,2]", "[3,3]", "[4,4]"], "[[[[1,1],[2,2]],[3,3]],[4,4]]");
+    testAdd(["[1,1]", "[2,2]", "[3,3]", "[4,4]", "[5,5]"], "[[[[3,0],[5,3]],[4,4]],[5,5]]");
+    testAdd(["[1,1]", "[2,2]", "[3,3]", "[4,4]", "[5,5]", "[6,6]"], "[[[[5,0],[7,4]],[5,5]],[6,6]]");
 
-    // testSplit("[[[[0,7],4],[15,[0,13]]],[1,1]]", "[[[[0,7],4],[[7,8],[0,13]]],[1,1]]");
-    // testSplit("[[[[0,7],4],[[7,8],[0,13]]],[1,1]]", "[[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]");
+    testSplit("[[[[0,7],4],[15,[0,13]]],[1,1]]", "[[[[0,7],4],[[7,8],[0,13]]],[1,1]]");
+    testSplit("[[[[0,7],4],[[7,8],[0,13]]],[1,1]]", "[[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]");
 
-    // testAdd(["[[[[4,3],4],4],[7,[[8,4],9]]]", "[1,1]"], "[[[[0,7],4],[[7,8],[6,0]]],[8,1]]");
+    testAdd(["[[[[4,3],4],4],[7,[[8,4],9]]]", "[1,1]"], "[[[[0,7],4],[[7,8],[6,0]]],[8,1]]");
     testAdd(["[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]","[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]"], "[[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]]");
+
+    testMagnitude("[[9,1],[1,9]]", 129);
+    testMagnitude("[[1,2],[[3,4],5]]", 143);
+    testMagnitude("[[[[0,7],4],[[7,8],[6,0]]],[8,1]]", 1384);
+    testMagnitude("[[[[1,1],[2,2]],[3,3]],[4,4]]", 445);
+    testMagnitude("[[[[3,0],[5,3]],[4,4]],[5,5]]", 791);
+    testMagnitude("[[[[5,0],[7,4]],[5,5]],[6,6]]", 1137);
+    testMagnitude("[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]", 3488);
+
+    const input = fs.readFileSync("inputs/input18-test.txt", "utf8").split("\n");
+    testAdd(input, "[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]");
+}
+
+function getLargestMagnitude(input: string[]) {
+    // make an array of pairs of each element with every other element
+    let maxMag = 0;
+    for (let i = 0; i < input.length; i++) {
+        for (let j = 0; j < input.length; j++) {
+            if (i !== j) {
+                const x = new SnailFishNumber(parseNumberString(input[i]));
+                const y = new SnailFishNumber(parseNumberString(input[j]));
+                const xy = x.add(y);
+                const mag = xy.magnitude;
+                maxMag = Math.max(maxMag, mag);
+                console.log(`${x} + ${y} (or vice-versa) = ${mag}`);
+            }
+        }
+    }
+    return maxMag;
 }
 
 test();
 
-//const input = fs.readFileSync("input18-test.txt", "utf8").split("\n");
+console.log("Part 1:");
+const input = fs.readFileSync("inputs/input18.txt", "utf8").split("\n");
+const res = addNums(input);
+console.log(res.toString());
+console.log(res.magnitude);
+
+console.log("");
+console.log("Part 2 test:");
+const input2test = fs.readFileSync("inputs/input18-test2.txt", "utf8").split("\n");
+console.log(`Result: ${getLargestMagnitude(input2test)}`);
+
+const input2real = fs.readFileSync("inputs/input18.txt", "utf8").split("\n");
+console.log(`Result: ${getLargestMagnitude(input2real)}`);
