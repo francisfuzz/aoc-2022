@@ -12,11 +12,6 @@ const offSetMap = [
     [1, 1]
 ];
 
-// read in the input file
-const input = fs.readFileSync('inputs/input20.txt', 'utf8').split("\n");
-const map = input[0];
-const inputImage = input.slice(2);
-
 function lookupValue(code: string) {
     const binValue = code.replace(/\./gi, "0").replace(/#/gi, "1");
     const index = parseInt(binValue, 2);
@@ -27,7 +22,7 @@ function printImage(image: string[]) {
     image.forEach(row => console.log(row));
 }
 
-function findStringForPixel(image: string[], row: number, col: number) {
+function findStringForPixel(image: string[], row: number, col: number, outsideIsLit: boolean): string {
     let code = "";
     for (let offset = 0; offset < offSetMap.length; offset++) {
         const [rowOffset, colOffset] = offSetMap[offset];
@@ -36,24 +31,19 @@ function findStringForPixel(image: string[], row: number, col: number) {
         if (lookupRow >= 0 && lookupRow < image.length && lookupCol >= 0 && lookupCol < image[0].length) {
             code += image[lookupRow][lookupCol];
         } else {
+            //code += outsideIsLit ? map[map.length - 1] : map[0];
             code += ".";
         }
     }
     return code;
 }
 
-printImage(inputImage);
-const code = findStringForPixel(inputImage, 2, 2);
-const pixel = lookupValue(code);
-console.log(code);
-console.log(pixel);
-
-function enhance(inputImage: string[]) {
+function enhance(inputImage: string[], outsideIsLit: boolean): string[] {
     const outputImage = [];
     for (let row = -1; row <= inputImage.length; row++) {
         let newRow = "";
         for (let col = -1; col <= inputImage[0].length; col++) {
-            const code = findStringForPixel(inputImage, row, col);
+            const code = findStringForPixel(inputImage, row, col, outsideIsLit);
             const pixel = lookupValue(code);
             newRow += pixel;
         }
@@ -66,10 +56,30 @@ function countLightPixels(image: string[]) {
     return image.reduce((acc, row) => row.replace(/\./gi, "").length + acc, 0);
 }
 
+function enhanceNTimes(inputImage: string[], n: number) {
+    let image = inputImage;
+    for (let i = 1; i <= n; i++) {
+        image = enhance(image, i % 2 !== 0);
+        printImage(image);
+        console.log("");
+    }
+    return image;
+}
+
+// read in the input file
+const input = fs.readFileSync('inputs/input20-test.txt', 'utf8').split("\n");
+const map = input[0];
+const inputImage = input.slice(2);
+
+// printImage(inputImage);
+// const code = findStringForPixel(inputImage, 2, 2);
+// const pixel = lookupValue(code);
+// console.log(code);
+// console.log(pixel);
+//console.log("");
+//console.log("Enhancing...");
+
+// 5354
+let enhanced = enhanceNTimes(inputImage, 2);
 console.log("");
-console.log("Enhancing...");
-let enhaced = enhance(inputImage);
-enhaced = enhance(enhaced);
-printImage(enhaced);
-console.log("");
-console.log(`Count of light pixels: ${countLightPixels(enhaced)}`);
+console.log(`Count of light pixels: ${countLightPixels(enhanced)}`);
