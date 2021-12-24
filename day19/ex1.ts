@@ -69,7 +69,7 @@ class Point {
     }
 
     manhattan(other: Point) {
-        return Math.abs(this.x) + Math.abs(other.x) + Math.abs(this.y) + Math.abs(other.y) + Math.abs(this.z) + Math.abs(other.z);
+        return Math.abs(this.x - other.x) + Math.abs(this.y - other.y) + Math.abs(this.z - other.z);
     }
 }
 
@@ -138,8 +138,24 @@ function constructMap(reports: ScanReport[]) {
     return [detectedScanners, scanner0];
 }
 
+function findLargestManhattan(points: Point[]) {
+    let max = 0;
+    for (let i = 0; i < points.length; i++) {
+        for (let j = 0; j < points.length; j++) {
+            if (i !== j) {
+                const manhattan = points[i].manhattan(points[j]);
+                max = Math.max(max, manhattan);
+            }
+        }
+    }
+    return max;
+}
+
 const inputReports = fs.readFileSync("inputs/input19.txt", "utf8").split("\n\n");
 const reports = inputReports.map(r => new ScanReport(r.split("\n")));
-const [_, scanner0] = constructMap(reports);
+const [scanners, scanner0] = constructMap(reports);
 let pointSet = new Set((<ScanReport>scanner0).points);
-console.log(pointSet.size);
+console.log(`There are ${pointSet.size} beacons`);
+
+let maxManhattan = findLargestManhattan((<Point[]>scanners));
+console.log(`Max manhattan distance is ${maxManhattan}`);
