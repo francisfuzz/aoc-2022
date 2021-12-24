@@ -31,8 +31,7 @@ function findStringForPixel(image: string[], row: number, col: number, outsideIs
         if (lookupRow >= 0 && lookupRow < image.length && lookupCol >= 0 && lookupCol < image[0].length) {
             code += image[lookupRow][lookupCol];
         } else {
-            //code += outsideIsLit ? map[map.length - 1] : map[0];
-            code += ".";
+            code += map[0] === "." ? "." : outsideIsLit ? "#" : ".";
         }
     }
     return code;
@@ -59,27 +58,26 @@ function countLightPixels(image: string[]) {
 function enhanceNTimes(inputImage: string[], n: number) {
     let image = inputImage;
     for (let i = 1; i <= n; i++) {
-        image = enhance(image, i % 2 !== 0);
-        printImage(image);
+        image = enhance(image, i % 2 === 0);
+        //printImage(image);
         console.log("");
     }
     return image;
 }
 
 // read in the input file
-const input = fs.readFileSync('inputs/input20-test.txt', 'utf8').split("\n");
+const input = fs.readFileSync('inputs/input20.txt', 'utf8').split("\n");
 const map = input[0];
 const inputImage = input.slice(2);
 
-// printImage(inputImage);
-// const code = findStringForPixel(inputImage, 2, 2);
-// const pixel = lookupValue(code);
-// console.log(code);
-// console.log(pixel);
-//console.log("");
-//console.log("Enhancing...");
-
-// 5354
+console.log("Part 1:");
 let enhanced = enhanceNTimes(inputImage, 2);
+printImage(enhanced);
+console.log("");
+console.log(`Count of light pixels: ${countLightPixels(enhanced)}`);
+
+console.log("Part 2:");
+enhanced = enhanceNTimes(inputImage, 50);
+printImage(enhanced);
 console.log("");
 console.log(`Count of light pixels: ${countLightPixels(enhanced)}`);
