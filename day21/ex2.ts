@@ -25,7 +25,19 @@ class UniverseGame {
     static player1Wins: number = 0;
     static player2Wins: number = 0;
 
-    constructor(public player1: Player, public player2: Player, public player1Turn: boolean) {
+    constructor(public player1: Player, public player2: Player, public player1Turn: boolean, public throwVal: number) {
+    }
+
+    playToEnd() {
+        if (this.player1Turn) {
+            this.player1.scoreRound(this.throwVal);
+        } else {
+            this.player2.scoreRound(this.throwVal);
+        }
+        while (!this.isWon()) {
+            this.player1Turn = !this.player1Turn;
+            this.rollDie();
+        }
     }
 
     rollDie() {
@@ -33,26 +45,11 @@ class UniverseGame {
             for (let roll2 = 1; roll2 <= 3; roll2++) {
                 for (let roll3 = 1; roll3 <= 3; roll3++) {
                     const thisRoll = roll1 + roll2 + roll3;
-                    if (this.player1Turn) {
-                        this.player1.scoreRound(thisRoll);
-                        if (this.isWon()) {
-                            UniverseGame.player1Wins++;
-                        } else {
-                            universes.push(new UniverseGame(new Player(this.player1), new Player(this.player2), false));
-                        }
-                    } else {
-                        this.player2.scoreRound(thisRoll);
-                        if (this.isWon()) {
-                            UniverseGame.player2Wins++;
-                        } else {
-                            universes.push(new UniverseGame(new Player(this.player1), new Player(this.player2), true));
-                        }
-                    }
+                    universes.push(new UniverseGame(new Player(this.player1), new Player(this.player2), this.player1Turn, thisRoll));
                     this.player1Turn = !this.player1Turn;
                 }
             }
         }
-        return !this.isWon();
     }
 
     isWon() {
