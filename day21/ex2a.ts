@@ -15,8 +15,12 @@ class Universe {
         }
         if (this.player1Score >= 21) {
             Universe.player1Wins++;
+            console.log(`1: ${Universe.player1Wins}`);
         }
-        if (this.player2Score >= 21) Universe.player2Wins++;
+        if (this.player2Score >= 21) {
+            Universe.player2Wins++;
+            console.log(`2: ${Universe.player2Wins}`);
+        }
         this.player1Turn = !this.player1Turn;
     }
 
@@ -50,8 +54,8 @@ let universes = [firstUniverse];
 
 while (universes.length > 0) {
     universes = rollDice(universes);
-    console.log(universes.length);
+    console.log(`${universes.length} unis`);
 }
 console.log("Complete");
-console.log(Universe.player1Wins);
-console.log(Universe.player2Wins);
+console.log(`Player 1 wins: ${Universe.player1Wins}`);
+console.log(`Player 2 wins: ${Universe.player2Wins}`);
