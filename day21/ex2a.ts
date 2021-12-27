@@ -1,61 +1,41 @@
-class Universe {
-    static player1Wins: number = 0;
-    static player2Wins: number = 0;
-
-    constructor(public player1Turn: boolean, public player1Pos: number, public player1Score: number, public player2Pos: number, public player2Score: number) {
-    }
-
-    scoreRound(moves: number) {
-        if (this.player1Turn) {
-            this.player1Pos = (this.player1Pos + moves) % 10;
-            this.player1Score += this.player1Pos === 0 ? 10 : this.player1Pos;
-        } else {
-            this.player2Pos = (this.player2Pos + moves) % 10;
-            this.player2Score += this.player2Pos === 0 ? 10 : this.player2Pos;
-        }
-        if (this.player1Score >= 21) {
-            Universe.player1Wins++;
-            console.log(`1: ${Universe.player1Wins}`);
-        }
-        if (this.player2Score >= 21) {
-            Universe.player2Wins++;
-            console.log(`2: ${Universe.player2Wins}`);
-        }
-        this.player1Turn = !this.player1Turn;
-    }
-
-    isWon() {
-        return this.player1Score >= 21 || this.player2Score >= 21;
-    }
+interface IScore {
+    p1Wins: number,
+    p2Wins: number
 }
 
-function rollDice(universes: Universe[]) {
-    const unwonUniverses: Universe[] = [];
-    universes.forEach(u => {
-        for (let roll1 = 1; roll1 <= 3; roll1++) {
-            for (let roll2 = 1; roll2 <= 3; roll2++) {
-                for (let roll3 = 1; roll3 <= 3; roll3++) {
-                    const thisRoll = roll1 + roll2 + roll3;
-                    const newUniverse = new Universe(u.player1Turn, u.player1Pos, u.player1Score, u.player2Pos, u.player2Score);
-                    newUniverse.scoreRound(thisRoll);
-                    if (!newUniverse.isWon()) {
-                        unwonUniverses.push(newUniverse);
-                    }
-                }
+const CACHE = new Map<string, IScore>();
+function countWins(p1Pos: number, p2Pos: number, p1Score: number, p2Score: number) {
+    // "p1" never wins because we always switch players
+    if (p2Score >= 21) {
+        return <IScore>{ p1Wins: 0, p2Wins: 1 };
+    }
+    const key = `${p1Pos}-${p2Pos}-${p1Score}-${p2Score}`;
+    const cached = CACHE.get(key);
+    if (cached) {
+        return cached;
+    }
+    const res = <IScore>{ p1Wins: 0, p2Wins: 0 };
+    for (let d1 = 1; d1 <= 3; d1++) {
+        for (let d2 = 1; d2 <= 3; d2++) {
+            for (let d3 = 1; d3 <= 3; d3++) {
+                const move = d1 + d2 + d3;
+                const newPos = (p1Pos + move) % 10;
+                const newScore = p1Score + (newPos === 0 ? 10 : newPos);
+                
+                // p2 becomes p1 for the next round
+                const countsFromHere = countWins(p2Pos, newPos, p2Score, newScore);
+                res.p1Wins += countsFromHere.p2Wins;
+                res.p2Wins += countsFromHere.p1Wins;
             }
         }
-    });
-    return unwonUniverses;
+    }
+    CACHE.set(key, res);
+    return res;
 }
 
-// set up the first universe
-const firstUniverse = new Universe(true, 4, 0, 5, 0);
-let universes = [firstUniverse];
-
-while (universes.length > 0) {
-    universes = rollDice(universes);
-    console.log(`${universes.length} unis`);
-}
-console.log("Complete");
-console.log(`Player 1 wins: ${Universe.player1Wins}`);
-console.log(`Player 2 wins: ${Universe.player2Wins}`);
+const startTime = Date.now();
+const result = countWins(4, 5, 0, 0);
+const endTime = Date.now();
+console.log(`Elapsed time: ${endTime - startTime}ms`);
+console.log(`${CACHE.size} cache entries`);
+console.log(`Player 1 wins ${result.p1Wins} times, Player 2 wins ${result.p2Wins} times`);
