@@ -1,1 +1,1 @@
-# A Repo for Advent of Code 2021 in TypeScript
+# A Repo for Advent of Code 2022 in TypeScript
