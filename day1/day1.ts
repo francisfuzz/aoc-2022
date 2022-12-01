@@ -5,7 +5,7 @@ function readFile(fileName: string): string {
 }
 
 const contents = readFile("inputs/input1.txt");
-const data: string[] = contents.split("\n");
+const data: Array<string> = contents.split("\n");
 
 // Prompt
 // Find the Elf carrying the most Calories. How many total Calories is that Elf carrying?
