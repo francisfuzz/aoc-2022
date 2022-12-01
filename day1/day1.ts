@@ -1,7 +1,7 @@
-import * as fs from "fs";
+import {readFileSync} from "fs";
 
 function readFile(fileName: string): string {
-    return fs.readFileSync(fileName, "utf8");
+    return readFileSync(fileName, "utf8");
 }
 
 const contents = readFile("inputs/input1.txt");
