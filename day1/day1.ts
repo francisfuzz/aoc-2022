@@ -24,4 +24,10 @@ data.forEach((element: string) => {
     }
 });
 
-console.log(`The Elf carrying the most Calories: ${elves.sort((b, a) => a - b)[0]}`)
+const elvesSortedDesc: Array<number> = elves.sort((a, b) => b - a)
+
+// Part 1
+console.log(`The Elf carrying the most Calories: ${elvesSortedDesc[0]}`)
+
+// Part 2
+console.log(`The total weight the top 3 elves are carrying: ${elvesSortedDesc.slice(0,3).reduce((p, c) => p + c, 0)}`)
