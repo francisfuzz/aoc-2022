@@ -6,21 +6,4 @@ function readFile(fileName: string): string {
 }
 
 let contents = readFile("inputs/input1.txt");
-//console.log(contents);
-
-// count the number of times a depth measurement increases from the previous measurement. (There is no measurement before the first measurement.)
-function countIncreases(contents: string): number {
-    let prev = null;
-    let count = 0;
-    let lines = contents.split("\n");
-    for (let line of lines) {
-        let current = parseInt(line);
-        if (prev && current > prev) {
-            count++;
-        }
-        prev = current;
-    }
-    return count;
-}
-
-console.log(`The number of times the depth increases is ${countIncreases(contents)}`);
+console.log(contents);
