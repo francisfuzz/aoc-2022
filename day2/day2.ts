@@ -1,10 +1,5 @@
 import {readFileSync} from "fs";
 
-function readFile(fileName: string): string {
-    return readFileSync(fileName, "utf8");
-}
-
-const contents = readFile("inputs/input2.txt");
+const contents = readFileSync("inputs/input2.txt", "utf8");
 const encryptedStrategyGuide: Array<string> = contents.split("\n");
-
-console.log(encryptedStrategyGuide)
+console.log(encryptedStrategyGuide);
