@@ -90,10 +90,8 @@ function counterShape (opponentChoice: string, desiredOutcome: string): string {
     return rubric[opponentChoice][desiredOutcome] || '';
 }
 
-let totalScore = 0
-
 // Compute and assign the final score to its own variable.
-encryptedStrategyGuide.forEach((round: string) => {
+const totalScore = encryptedStrategyGuide.reduce((accumulator: number, round: string): number => {
     // Parse the round's respective inputs.
     const [opponentChoice, desiredOutcome] = round.split(' ');
 
@@ -108,8 +106,8 @@ encryptedStrategyGuide.forEach((round: string) => {
     const ts = selectedScore(myChoice) + outcomeScore(myChoice, oc);
 
     // Add this round's total score to the `totalScore`.
-    totalScore += ts;
-})
+    return accumulator + ts;
+}, 0)
 
 // Part 2
 console.log(`The total score is ${totalScore}`);
