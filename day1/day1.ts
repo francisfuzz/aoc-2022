@@ -12,7 +12,7 @@ const data: Array<string> = contents.split("\n");
 
 // Initialize an array where each element represents the calories an elf is carrying.
 // The first element is the first elf with zero calories.
-let elves: Array<number> = [0]
+const elves: Array<number> = [0]
 
 data.forEach((element: string) => {
     // If it's an empty string, add a new elf to `elves`
