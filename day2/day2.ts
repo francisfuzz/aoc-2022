@@ -1,12 +1,11 @@
+// Setup.
 import {readFileSync} from "fs";
-
 const contents = readFileSync("inputs/input2.txt", "utf8");
-// const encryptedStrategyGuide: Array<string> = contents.split("\n");
-// console.log(encryptedStrategyGuide);
+const encryptedStrategyGuide: Array<string> = contents.split("\n");
 
-const sampleGuide: Array<string> = ['A Y', 'B X', 'C Z'];
-
+// Custom type to model a shape and its value.
 type ShapeHolder = {[name: string]: number};
+// Custom type that composes any name to a shape and its value.
 type Rubric = {[name: string]: ShapeHolder};
 
 // Converts the letter to the human-readable shape.
@@ -27,7 +26,7 @@ function decrypt (letter: string): string {
 }
 
 // Computes the score for the selected shape.
-function selectedScore(choice: string): number{
+function selectedScore(choice: string): number {
     const selectedShapes: ShapeHolder = {
         rock: 1,
         paper: 2,
@@ -38,6 +37,10 @@ function selectedScore(choice: string): number{
 }
 
 // Computes the score of the outcome based on two choices, favoring `myChoice`.
+// Score mapping:
+// `0` is a loss
+// `3` is a draw
+// `6` is a win
 function outcomeScore(myChoice: string, opponentChoice: string): number {
     const rubric: Rubric = {
         rock: {
@@ -60,11 +63,16 @@ function outcomeScore(myChoice: string, opponentChoice: string): number {
     return rubric[myChoice][opponentChoice] || 0;
 }
 
-const finalScore: number = sampleGuide.reduce((accumulator: number, round: string) => {
+// Compute and assign the final score to its own variable.
+const finalScore: number = encryptedStrategyGuide.reduce((accumulator: number, round: string) => {
+    // Parse the round's respective inputs.
     const [opponentChoice, suggestedChoice] = round.split(' ');
+
+    // Obtain the human-readable values of these choices.
     const oc = decrypt(opponentChoice);
     const sc = decrypt(suggestedChoice);
 
+    // Return the sum of the previous sums, the selected score of the suggested choice, and the outcome score.
     return accumulator + selectedScore(sc) + outcomeScore(sc, oc)
 }, 0)
 
