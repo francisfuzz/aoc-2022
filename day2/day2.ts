@@ -5,6 +5,6 @@ function readFile(fileName: string): string {
 }
 
 const contents = readFile("inputs/input2.txt");
-const data: Array<string> = contents.split("\n");
+const encryptedStrategyGuide: Array<string> = contents.split("\n");
 
-console.log(data)
+console.log(encryptedStrategyGuide)
