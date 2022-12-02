@@ -5,7 +5,8 @@
   "description": "advent of code 2022",
   "main": "index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "lint": "npx eslint ."
   },
   "repository": {
     "type": "git",
