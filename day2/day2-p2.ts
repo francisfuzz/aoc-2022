@@ -6,7 +6,9 @@ const encryptedStrategyGuide: Array<string> = contents.split("\n");
 type ShapeCounter = {[name: string]: number};
 type ScoreRubric = {[name: string]: ShapeCounter};
 
-type ShapeToShape = {[name: string]: string};
+type Shapes = 'rock' | 'paper' | 'scissors';
+
+type ShapeToShape = {[name: string]: Shapes};
 type ShapeMap = {[name: string]: ShapeToShape};
 
 // Converts the letter to the human-readable meaning.
