@@ -1,9 +1,7 @@
 // Setup.
 import {readFileSync} from "fs";
-// const contents = readFileSync("inputs/input2.txt", "utf8");
-// const encryptedStrategyGuide: Array<string> = contents.split("\n");
-
-const encryptedStrategyGuide = ['A Y', 'B X', 'C Z']
+const contents = readFileSync("inputs/input2.txt", "utf8");
+const encryptedStrategyGuide: Array<string> = contents.split("\n");
 
 type ShapeCounter = {[name: string]: number};
 type ScoreRubric = {[name: string]: ShapeCounter};
@@ -69,6 +67,7 @@ function outcomeScore (myChoice: string, opponentChoice: string): number {
     return rubric[myChoice][opponentChoice] || 0;
 }
 
+// Returns the shape to counter an opponent's choice with given a desired outcome.
 function counterShape (opponentChoice: string, desiredOutcome: string): string {
     const rubric: ShapeMap = {
         rock: {
@@ -91,6 +90,8 @@ function counterShape (opponentChoice: string, desiredOutcome: string): string {
     return rubric[opponentChoice][desiredOutcome] || '';
 }
 
+let totalScore = 0
+
 // Compute and assign the final score to its own variable.
 encryptedStrategyGuide.forEach((round: string) => {
     // Parse the round's respective inputs.
@@ -99,14 +100,16 @@ encryptedStrategyGuide.forEach((round: string) => {
     // Obtain the human-readable values of these inputs.
     const oc = decrypt(opponentChoice);
     const desired = decrypt(desiredOutcome);
+
+    // Compute my choice based on the opponent's choice and desired outcome.
     const myChoice = counterShape(oc, desired);
-    const ts = selectedScore(myChoice) + outcomeScore(myChoice, oc)
 
-    console.log(`Opponent is ${oc}.`)
-    console.log(`Desired outcome is ${desired}.`)
-    console.log(`The choice I need to make is ${myChoice}.`)
+    // Compute the total score: take the sum of the selected score for my choice and the outcome score.
+    const ts = selectedScore(myChoice) + outcomeScore(myChoice, oc);
 
-    console.log(`The selected shape score is ${selectedScore(myChoice)}.`)
-    console.log(`The outcome score is ${outcomeScore(myChoice, oc)}.`)
-    console.log(`${selectedScore(myChoice)} + ${outcomeScore(myChoice, oc)} = ${ts}.`)
+    // Add this round's total score to the `totalScore`.
+    totalScore += ts;
 })
+
+// Part 2
+console.log(`The total score is ${totalScore}`);
