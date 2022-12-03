@@ -5,8 +5,8 @@ const rucksackData: Array<string> = contents.split("\n");
 
 type AlphabetScorer = {[letter: string]: number};
 
-const alphabet = 'abcdefghijklmnopqrstuvwxyz';
-const alphabetScorer: AlphabetScorer = (alphabet.concat(alphabet.toUpperCase())).split('').reduce((acc: AlphabetScorer, letter: string, index: number) => {
+const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const alphabetScorer: AlphabetScorer = (alphabet).split('').reduce((acc: AlphabetScorer, letter: string, index: number) => {
   acc[letter] = index + 1;
   return acc;
 }, {});
