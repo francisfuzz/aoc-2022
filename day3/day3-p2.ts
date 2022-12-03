@@ -11,3 +11,17 @@ const alphabetScorer: AlphabetScorer = (alphabet).split('').reduce((acc: Alphabe
   return acc;
 }, {});
 
+// Make a copy of the data
+let rucksackQueue: Array<string> = rucksackData.slice();
+const BATCH_SIZE = 3;
+
+// Keep processing the queue until there's nothing left
+while (rucksackQueue.length > 0) {
+  // Create a batch
+  const batch = rucksackQueue.slice(0, BATCH_SIZE);
+
+  // ...
+
+  // Update the queue
+  rucksackQueue = rucksackQueue.slice(BATCH_SIZE);
+}
