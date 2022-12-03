@@ -15,6 +15,7 @@ const alphabetScorer: AlphabetScorer = (alphabet).split('').reduce((acc: Alphabe
 let rucksackQueue: Array<string> = rucksackData.slice();
 const BATCH_SIZE = 3;
 
+// Keep a tally of the priority score.
 let priorityScore = 0;
 
 // Keep processing the queue until there's nothing left
@@ -22,7 +23,8 @@ while (rucksackQueue.length > 0) {
   // Create a batch
   const batch = rucksackQueue.slice(0, BATCH_SIZE).map(r => r.split(''));
 
-  // Create a set for each rucksack
+  // Create a set for each rucksack.
+  // Because a value in a Set may only occur once, that value is unique in its collection.
   const s0 = new Set([...batch[0]]);
   const s1 = new Set([...batch[1]]);
   const s2 = new Set([...batch[2]]);
@@ -39,4 +41,5 @@ while (rucksackQueue.length > 0) {
   rucksackQueue = rucksackQueue.slice(BATCH_SIZE);
 }
 
+// Part 2
 console.log(`The sum of the priorities of these item types: ${priorityScore}`);
