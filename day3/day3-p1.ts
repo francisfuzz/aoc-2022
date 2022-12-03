@@ -1,6 +1,6 @@
 // Setup.
 import {readFileSync} from "fs";
-const contents = readFileSync("inputs/input3-sample.txt", "utf8");
+const contents = readFileSync("inputs/input3.txt", "utf8");
 const rucksackData: Array<string> = contents.split("\n");
 
 type AlphabetScorer = {[letter: string]: number};
