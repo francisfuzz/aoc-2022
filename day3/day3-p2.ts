@@ -1,6 +1,6 @@
 // Setup.
 import {readFileSync} from "fs";
-const contents = readFileSync("inputs/input3-sample.txt", "utf8");
+const contents = readFileSync("inputs/input3.txt", "utf8");
 const rucksackData: ReadonlyArray<string> = contents.split("\n");
 
 // Map a letter to its priority score.
