@@ -11,17 +11,34 @@ const alphabetScorer: AlphabetScorer = (alphabet).split('').reduce((acc: Alphabe
   return acc;
 }, {});
 
+// let priorityScore: number = 0;
+
 // Make a copy of the data
 let rucksackQueue: Array<string> = rucksackData.slice();
 const BATCH_SIZE = 3;
 
+let priorityScore = 0;
+
 // Keep processing the queue until there's nothing left
 while (rucksackQueue.length > 0) {
   // Create a batch
-  const batch = rucksackQueue.slice(0, BATCH_SIZE);
+  const batch = rucksackQueue.slice(0, BATCH_SIZE).map(r => r.split(''));
 
-  // ...
+  // Create a set for each rucksack
+  const s0 = new Set([...batch[0]]);
+  const s1 = new Set([...batch[1]]);
+  const s2 = new Set([...batch[2]]);
 
+  // Iterate through each of this set's elements.
+  for (const item of s0) {
+    // If this element is in all three sets...
+    if (s1.has(item) && s2.has(item)) {
+      // Add it to the priority score.
+      priorityScore += alphabetScorer[item];
+    }
+  }
   // Update the queue
   rucksackQueue = rucksackQueue.slice(BATCH_SIZE);
 }
+
+console.log(`The sum of the priorities of these item types: ${priorityScore}`);
