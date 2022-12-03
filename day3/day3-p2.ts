@@ -11,8 +11,6 @@ const alphabetScorer: AlphabetScorer = (alphabet).split('').reduce((acc: Alphabe
   return acc;
 }, {});
 
-// let priorityScore: number = 0;
-
 // Make a copy of the data
 let rucksackQueue: Array<string> = rucksackData.slice();
 const BATCH_SIZE = 3;
