@@ -13,7 +13,7 @@ const alphabetScorer: AlphabetScorer = (alphabet).split('').reduce((acc: Alphabe
 
 let totalScore = 0
 
-const r = rucksackData.forEach((rucksack: string) => {
+rucksackData.forEach((rucksack: string) => {
   const demarcation = rucksack.length / 2;
   const firstCompartment = rucksack.slice(0, demarcation);
   const secondCompartment = rucksack.slice(demarcation);
