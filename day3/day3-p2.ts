@@ -21,6 +21,7 @@ let priorityScore = 0;
 // Keep processing the queue until there's nothing left
 while (rucksackQueue.length > 0) {
   // Create a batch
+  // FRAGILITY: this will break if the rucksack data is no longer divisible by batch size!
   const batch = rucksackQueue.slice(0, BATCH_SIZE).map(r => r.split(''));
 
   // Create a set for each rucksack.
