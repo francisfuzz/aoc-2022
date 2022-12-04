@@ -11,9 +11,10 @@ function isWithin (n: number, minBound: number, maxBound: number): boolean {
   return n >= minBound && n <= maxBound
 }
 
+// Create a variable to store the number of containment pairs.
 let containmentPairs = 0;
 
-// Think about `2-4,6-8` as an example
+// Iterate through each of the section assignment pairs.
 data.forEach((sectionAssignmentPair: string) => {
   // Split the section assignments.
   const [first, second] = sectionAssignmentPair.split(',');
@@ -22,6 +23,7 @@ data.forEach((sectionAssignmentPair: string) => {
   const [a1, a2] = first.split('-').map(i => parseInt(i));
   const [b1, b2] = second.split('-').map(i => parseInt(i));
 
+  // Only add the containment pair if either the section assignment is within one or the other.
   if ((isWithin(a1, b1, b2) && isWithin(a2, b1, b2)) || (isWithin(b1, a1, a2) && isWithin(b2, a1, a2))) {
       containmentPairs += 1;
     }
