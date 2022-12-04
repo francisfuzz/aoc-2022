@@ -1,6 +1,6 @@
 // Setup.
 import {readFileSync} from "fs";
-const contents = readFileSync("inputs/input4-sample.txt", "utf8");
+const contents = readFileSync("inputs/input4.txt", "utf8");
 const data: Array<string> = contents.split("\n");
 
 // Part 1 Prompt
