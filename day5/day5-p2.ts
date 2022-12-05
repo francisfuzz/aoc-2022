@@ -3,8 +3,9 @@ import {readFileSync} from "fs";
 const contents = readFileSync("inputs/input5.txt", "utf8");
 const data: string[] = contents.split("\n");
 
-// Part 1 Prompt
-// After the rearrangement procedure completes, what crate ends up on top of each stack?
+// Part 2 Prompt
+// After the rearrangement procedure completes with the CrateMover 9001, 
+// what crate ends up on top of each stack?
 
 // The stack data and instructions are separated by a line with the empty string.
 const SEPARATOR_INDEX = data.indexOf('');
