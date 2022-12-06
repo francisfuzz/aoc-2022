@@ -18,7 +18,7 @@ for (let i = 0; i < data.length; i++) {
   // Iterate through 14 characters of the buffer at a time.
   for (let j = 14; j < buffer.length; j++) {
 
-    // Cache a reference to the current slice.
+    // Cache a reference to the current chunk.
     const chunk = buffer.slice(j - 14, j);
 
     // Use a set to get the unique characters of the chunk.
