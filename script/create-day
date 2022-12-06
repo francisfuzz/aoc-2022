@@ -1,0 +1,14 @@
+#!/usr/bin/zsh
+# Create a new directory for the specified day
+# Usage: create-day $DAY
+
+DAY=$1
+
+# Create the directory
+mkdir -p day$DAY
+# Create the input files
+touch day$DAY/day$DAY-{sample,p1,p2}.ts
+
+# Create the input files
+touch inputs/input$DAY-sample.txt
+touch inputs/input$DAY.txt
