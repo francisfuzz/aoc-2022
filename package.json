@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/francisfuzz/aoc2022.git"
+    "url": "git+https://github.com/francisfuzz/aoc-2022.git"
   },
   "author": "Colin Dembovsky",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/francisfuzz/aoc2022/issues"
+    "url": "https://github.com/francisfuzz/aoc-2022/issues"
   },
-  "homepage": "https://github.com/francisfuzz/aoc2022#readme",
+  "homepage": "https://github.com/francisfuzz/aoc-2022#readme",
   "dependencies": {
     "fs": "^0.0.1-security"
   },
