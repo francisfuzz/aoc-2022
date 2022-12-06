@@ -18,3 +18,7 @@ node dist/day1.js
 # Use `ts-node` directly
 npx ts-node day1/day1.ts
 ```
+
+## Credits
+
+Originally forked from https://github.com/colindembovsky/aoc2021. Moved to its own repository so it is a root repo.
