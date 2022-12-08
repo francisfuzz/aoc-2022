@@ -68,8 +68,32 @@ data.forEach((line: string) => {
     }
   }
 })
+// This may just be the silliest thing I write in the year 2022.
+// Recursion FTW
+function crawl (d: Directory, k: string): number {
+  // Base case: give back the total size if there's no subdirectories to process.
+  if (d[k].subdirectories.length === 0) {
+    return d[k].totalSize;
+  } else {
+    // Recursive step: crawl through each of the subdirectories
+    // And reduce it to the total sum of all of their sizes plus the total size.
+    return d[k].subdirectories.map(sd => {
+      return crawl(d, sd);
+    }).reduce((p: number, c:number) => {
+      return p + c;
+    }, 0) + d[k].totalSize;
+  }
+}
 
-// At this point, the representation is correct.
-console.log(fileSystem);
+// Update the total size with crawl
+Object.keys(fileSystem).forEach(k => {
+  fileSystem[k].totalSize = crawl(fileSystem, k);
+})
 
-// @todo: write a recursive function that updates the total sizes based on the subdirectories, if any.
+const sumOfTotalSizes = Object.keys(fileSystem).map(k => {
+  return (fileSystem[k].totalSize <= 100000) ? fileSystem[k].totalSize : 0
+}).reduce((p: number, c:number) => {
+  return p + c;
+}, 0);
+
+console.log(`The sum of the total sizes of directories at most 100000: ${sumOfTotalSizes}`);
