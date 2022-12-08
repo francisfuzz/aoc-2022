@@ -6,16 +6,16 @@ const data: string[] = contents.split("\n");
 type Directory = {
   [name: string]: {
     parent: string,
-    fileWeight: number,
-    subdirectoryWeight: number,
+    totalSize: number,
+    subdirectories: Array<string>
   }
 };
 
 const fileSystem: Directory = {
   "/": {
     parent: "",
-    fileWeight: 0,
-    subdirectoryWeight: 0,
+    totalSize: 0,
+    subdirectories: [],
   }
 };
 
@@ -50,40 +50,26 @@ data.forEach((line: string) => {
     // This is either a directory or a file.
     const [a, b] = line.split(' ');
     if (a === 'dir') {
-      // Update the filesystem with the new directory.
+      // Update the file system representation with this new directory.
       fileSystem[b] = {
         parent: cwd,
-        fileWeight: 0,
-        subdirectoryWeight: 0,
+        totalSize: 0,
+        subdirectories: [],
       };
+
+      // Append this new directory to the current working directory.
+      fileSystem[cwd].subdirectories.push(b)
+
       console.log(`added directory ${b} to ${cwd}`);
     } else {
       // Update the current working directory's file weight.
-      fileSystem[cwd].fileWeight += parseInt(a);
-      console.log(`fileWeight of ${cwd} is now ${fileSystem[cwd].fileWeight}`);
+      fileSystem[cwd].totalSize += parseInt(a);
+      console.log(`The total size of ${cwd} is now ${fileSystem[cwd].totalSize}`);
     }
   }
 })
 
+// At this point, the representation is correct.
 console.log(fileSystem);
 
-// Calculate the subdirectory weights
-Object.keys(fileSystem).forEach(dirName => {
-  const _p = fileSystem[dirName].parent;
-  if (_p !== "") {
-    fileSystem[_p].subdirectoryWeight += fileSystem[dirName].fileWeight;
-  }
-})
-
-// Calculate the sum of relevant total sizes
-const sumOfRelevantTotalSizes = Object.keys(fileSystem).map(dirName => {
-  const curr = fileSystem[dirName];
-
-  const totalWeight = curr.fileWeight + curr.subdirectoryWeight;
-
-  return (totalWeight <= 100000) ? totalWeight : 0;
-}).reduce((p: number, c: number) => {
-  return p + c;
-}, 0);
-
-console.log(sumOfRelevantTotalSizes);
+// @todo: write a recursive function that updates the total sizes based on the subdirectories, if any.
