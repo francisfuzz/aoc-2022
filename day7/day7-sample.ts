@@ -6,6 +6,8 @@ const contents = readFileSync("inputs/input7.txt", "utf8")
 // License: ISC via https://github.com/williammartin/aoc2022-ts/blob/b36376c9e9fff93fa989b32344af537a89ce62b0/package.json#L16
 // cc: https://opensource.org/licenses/ISC
 
+// [Q] At a high-level, how does the author think about how to scope each of the sections to rely on the type system for protection?
+
 // Structured Line Types
 type ChangeDirectory = { _t: "cd", to: string }
 type List = { _t: "ls" }
@@ -15,11 +17,17 @@ type File = { _t: "file", name: string, size: number }
 type Line = ChangeDirectory | List | Directory | File
 
 // Structured Line Constructors and Match
+// [Q] Is this way of assigning a variable a function definition the same as the following:
+// `const cd = (to: string): ChangeDirectory => { return { _t: "cd", to } }`
 const cd = (to: string): ChangeDirectory => ({ _t: "cd", to })
 const ls = (): List => ({ _t: "ls" })
 const dir = (name: string): Directory => ({ _t: "directory", name })
 const file = (name: string, size: number): File => ({ _t: "file", name, size })
 
+// [Q] How is the `<R>` type hole used here?
+// In the `parseFS` function, we use the `matchLine` function to match on the `Line` type.
+// Once the line's type (via `_t`) is matched, what's returned is its corresponding "callback"
+// function.
 const matchLine = <R>(line: Line, fns: {
   OnChangeDirectory: (cd: ChangeDirectory) => R,
   OnList: (list: List) => R,
@@ -58,6 +66,7 @@ const parseCommand = (s: string): ChangeDirectory | List => {
   if (cmd.length === 2) {
     return ls()
   } else {
+    // [Q] What does the `_` mean here? Is it a way of signifying assigned variables that don't get used?
     const [_$, _cmd, to] = cmd
     return cd(to)
   }
@@ -84,8 +93,13 @@ type FSNode = FSFile | FSDir
 const fsFile = (name: string, size: number): FSFile => ({ _t: "fs-file", name, size })
 const fsDir = (name: string, parent: FSDir | null = null): FSDir => ({ _t: "fs-dir", name, parent, nodes: new Map() })
 
+// [Q] Why is weak equality used here?
+// [Q] How does the `node is FSDir` work?
 const isDir = (node: FSNode): node is FSDir => node._t == "fs-dir"
 
+// This uses the same pattern as `matchLine` above.
+// The callback functions aren't actually defined here,
+// but sort of "passed off" into whatever is passed to the `matchFsNode` when it's called.
 const matchFSNode = <R>(node: FSNode, fns: {
   OnFSFile: (file: FSFile) => R,
   OnFSDir: (dir: FSDir) => R,
